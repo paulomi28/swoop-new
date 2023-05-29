@@ -47,7 +47,8 @@ const Standby = [
   },
   {
     key: '2',
-    option: 'Latest',
+    // option: 'Latest',
+    option: 'Lates',
     sub_option: { startTime: '10:00z', Duration: '10:00 hr', endTime: '20:00z' },
   },
 ];
@@ -76,7 +77,8 @@ const Flight = [
   },
   {
     key: '2',
-    option: 'Latest',
+    // option: 'Latest',
+    option: 'Lates',
     sub_option: [
       {
         key: '1',
@@ -1045,17 +1047,18 @@ export default function InReturns(props: any) {
           marginHorizontal: SIZES.padding,
           flexDirection: 'row',
           position: 'absolute',
-          bottom: SIZES.padding * 2,
+          bottom: SIZES.padding * 3,
           alignItems: 'center',
           flex: 1,
+          width:"65%",
         }}>
         <Image
           source={isDark ? icons.ic_comment_dark : icons.ic_comment_light}
           style={{ width: 27, height: 27 }}
         />
         <TextInput
-          placeholder="Comment"
-          style={{ ...FONTS.h3, marginLeft: SIZES.padding }}
+          placeholder="Comments"
+          style={{ ...FONTS.h3, marginLeft: SIZES.padding,width:"78%"}}
           placeholderTextColor={isDark ? COLORS.golden : COLORS.black}
           onChangeText={text => setComment(text)}
         />

@@ -49,7 +49,8 @@ const Standby = [
   },
   {
     key: '2',
-    option: 'Latest',
+    // option: 'Latest',
+    option: 'Lates',
     sub_option: { startTime: '10:00z', Duration: '10:00 hr', endTime: '20:00z' },
   },
 ];
@@ -72,8 +73,9 @@ export default function CreateSwapScreen({ navigation }: any) {
   };
 
   const handleConfirm = (date: any) => {
-    let newDate = moment(date).format('YYYY/MM/DD');
-    console.log(newDate);
+    let newDate  = moment(date).format('DD/MM/YYYY');
+    console.log(newDate,"new date logg");
+    console.log(date,"new date logg");
     setOpen(false);
     setSelectDate(date);
     setSecondDate(newDate);
@@ -220,7 +222,10 @@ export default function CreateSwapScreen({ navigation }: any) {
               />
               <Text
                 style={{
-                  color: secondDate !== '' ? COLORS.bgBlack : COLORS.darkGray,
+                  // color: secondDate !== '' ? COLORS.bgBlack : COLORS.darkGray,
+                  // color: secondDate !== '' ? COLORS.bgBlack : COLORS.darkGray,
+                  // color: secondDate !== '' ? COLORS.bgBlack : COLORS.darkGray,
+                  color: isDark ?  COLORS.golden : secondDate !== '' ? COLORS.bgBlack : COLORS.darkGray,
                   ...FONTS.h3,
                   ...styles.inputField,
                 }}>
@@ -255,8 +260,8 @@ export default function CreateSwapScreen({ navigation }: any) {
             />
             <Text
               style={{
-                color:
-                  selectedDutyType === '' ? COLORS.darkGray : COLORS.bgBlack,
+                color: isDark ? COLORS.golden : 
+                  selectedDutyType === '' ? COLORS.darkGray :  COLORS.bgBlack,
                 ...FONTS.h3,
                 ...styles.inputField,
               }}>
@@ -336,12 +341,12 @@ export default function CreateSwapScreen({ navigation }: any) {
                   style={{
                     //   width: Dimensions.get('window').width / 1.3,
                     flex: 1,
-                    color: COLORS.bgBlack,
+                    color:isDark ? COLORS.golden : COLORS.bgBlack,
                     paddingHorizontal: 10,
                   }}
                   value={searchFlight}
                   onChangeText={text => setSearchFlight(text)}
-                  placeholderTextColor={COLORS.darkGray}
+                  placeholderTextColor={isDark ? COLORS.golden :  COLORS.darkGray}
                   placeholder="Enter flight number"
                 />
                 <TouchableOpacity onPress={() => getFlight()}>

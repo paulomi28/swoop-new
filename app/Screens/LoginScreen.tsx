@@ -9,6 +9,8 @@ import {
   View,
   Alert,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from '../Contexts/AuthContext';
@@ -82,6 +84,7 @@ const LoginScreen = ({navigation}: any) => {
     );
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View
       style={{
         flex: 1,
@@ -129,6 +132,8 @@ const LoginScreen = ({navigation}: any) => {
               flexDirection: 'row',
               alignItems: 'center',
               marginVertical: SIZES.padding / 2,
+              width:"90%",
+
             }}>
             <Image
               source={isDark ? icons.ic_user_dark : icons.ic_user_light}
@@ -136,7 +141,7 @@ const LoginScreen = ({navigation}: any) => {
             />
             <TextInput
               placeholder="Username"
-              style={{...FONTS.h3, marginLeft: SIZES.padding}}
+              style={{...FONTS.h3, marginLeft: SIZES.padding,width:230}}
               //   secureTextEntry = {true}
               placeholderTextColor={
                 isDark ? COLORS.lightGolden : COLORS.darkGray
@@ -158,7 +163,7 @@ const LoginScreen = ({navigation}: any) => {
             />
             <TextInput
               placeholder="Password"
-              style={{...FONTS.h3, marginLeft: SIZES.padding}}
+              style={{...FONTS.h3, marginLeft: SIZES.padding,width:230}}
               secureTextEntry={true}
               placeholderTextColor={
                 isDark ? COLORS.lightGolden : COLORS.darkGray
@@ -284,6 +289,7 @@ const LoginScreen = ({navigation}: any) => {
         </View>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
