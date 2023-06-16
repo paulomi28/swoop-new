@@ -435,16 +435,25 @@ const SignUpScreen = ({navigation}: any) => {
                   // if data array is an array of objects then return selectedItem.property to render after item is selected
                   return selectedItem;
                 }}
+                rowTextStyle={{
+                  position:"absolute",
+                  left:10,
+                  color : isDark ? COLORS.golden : COLORS.bgBlack,
+                }}
                 rowTextForSelection={(item, index) => {
                   // text represented for each item in dropdown
                   // if data array is an array of objects then return item.property to represent item in dropdown
                   return item;
                 }}
-                defaultButtonText="Select Airline"
+                // defaultButtonText="Select Airline"
+                defaultButtonText="Airline"
+              
                 buttonStyle={{
                   width: '100%',
                   backgroundColor: isDark ? COLORS.bgBlack : COLORS.gray,
+                
                 }}
+                buttonTextStyle={{textAlign:"left",marginLeft:20,color:isDark ? COLORS.golden : COLORS.bgBlack}}
                 dropdownStyle={{
                   width: '80%',
                   backgroundColor: isDark ? COLORS.bgBlack : COLORS.gray,

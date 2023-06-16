@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext,useEffect} from 'react';
 import {
   Image,
   Platform,
@@ -19,6 +19,11 @@ import {COLORS, FONTS, icons, images, SIZES} from '../constants';
 import {ThemeContext} from '../Contexts/ThemeContext';
 import config from '../config';
 
+import {LoginManager} from 'react-native-fbsdk-next'
+import {GoogleSignin,statusCodes} from '@react-native-google-signin/google-signin'
+import {appleAuthAndroid , appleAuth} from '@invertase/react-native-apple-authentication'
+// import {v4 as uuid} from 'react-native-uuid'
+
 const LoginScreen = ({navigation}: any) => {
   const [username, setUserName] = useState('');
   const [Password, setPassword] = useState('');
@@ -31,6 +36,13 @@ const LoginScreen = ({navigation}: any) => {
   const {isDark} = useContext(ThemeContext);
 
   console.log(user, 'user');
+
+  // useEffect(()=>{
+  //   GoogleSignin.configure({
+  //     webClientId : "",
+  //     offlineAccess: true
+  //   })
+  // },[])
 
   const handleLogin = async () => {
     setLoading(true);
@@ -48,7 +60,7 @@ const LoginScreen = ({navigation}: any) => {
         body: formdata,
         redirect: 'follow',
       };
-      setLoading(false);
+      // setLoading(false);
       var res = await fetch(
         'https://client.appmania.co.in/Swoop/api/login',
         requestOptions,
@@ -75,6 +87,7 @@ const LoginScreen = ({navigation}: any) => {
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: isDark ? COLORS.bgBlack : COLORS.gray,
+          
         }}>
         <ActivityIndicator
           size={'large'}
@@ -82,6 +95,60 @@ const LoginScreen = ({navigation}: any) => {
         />
       </View>
     );
+
+    const googlelogin = async () =>{
+        try{
+          await GoogleSignin.hasPlayServices();
+          await GoogleSignin.signIn().then(result => {console.log(result)});
+        }catch(error : any){
+          if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+            // user cancelled the login flow
+            Alert.alert('User cancelled the login flow !');
+          } else if (error.code === statusCodes.IN_PROGRESS) {
+            Alert.alert('Signin in progress');
+            // operation (f.e. sign in) is in progress already
+          } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+            Alert.alert('Google play services not available or outdated !');
+            // play services not available or outdated
+          } else {
+            console.log(error)
+            Alert.alert('RNGoogleSignin: offline use requires server web ClientID');
+          }
+        }
+    }
+
+
+    const facebooklogin  = () =>{
+      LoginManager.logInWithPermissions(["public_profile", "email"]).then(
+        function (result) {
+        if (result.isCancelled) {
+          Alert.alert("Login Cancelled " + JSON.stringify(result))
+        } else {
+          Alert.alert("Login success with  permisssions: " + result?.grantedPermissions?.toString());
+          Alert.alert("Login Success " + result.toString());
+        }
+        },
+        function (error) {
+          Alert.alert("Login failed with error: " + error);
+        }
+        )
+        
+    }
+
+    const applelogin = async  () =>{
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+          requestedOperation : appleAuth.Operation.LOGIN,
+          requestedScopes : [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME]
+          
+      })
+      
+      const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        // user is authenticated
+      }
+
+    }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -238,20 +305,22 @@ const LoginScreen = ({navigation}: any) => {
               alignItems: 'center',
               marginVertical: SIZES.padding,
             }}>
-            <TouchableOpacity style={{marginHorizontal: SIZES.padding}}>
+            <TouchableOpacity onPress={()=>{googlelogin()}} style={{marginHorizontal: SIZES.padding}}>
               <Image
                 source={isDark ? icons.ic_google_dark : icons.ic_google_dark}
                 style={{width: 36, height: 36}}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{marginHorizontal: SIZES.padding}}>
+            <TouchableOpacity onPress={()=>{applelogin()}} style={{marginHorizontal: SIZES.padding}}>
               <Image
                 source={isDark ? icons.ic_apple_dark : icons.ic_apple_light}
                 resizeMode="contain"
                 style={{width: 36, height: 36}}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{marginHorizontal: SIZES.padding}}>
+            <TouchableOpacity 
+              onPress={()=>{facebooklogin()}}            
+            style={{marginHorizontal: SIZES.padding}}>
               <Image
                 source={
                   isDark ? icons.ic_Facebook_dark : icons.ic_Facebook_light

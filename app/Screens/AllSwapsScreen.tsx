@@ -170,7 +170,7 @@ const AllSwapScreen = ({ navigation }: any) => {
 
     const string = item.status;
     switch (item) {
-      case item.in_return.find(e => e.user_id == user.user_id) && item.status === 'Confirmation Pending':
+      case item.in_return.find((e : any) => e.user_id == user.user_id) && item.status === 'Confirmation Pending':
         return (
           <View>
             <Image
@@ -236,12 +236,19 @@ const AllSwapScreen = ({ navigation }: any) => {
             style={{ ...FONTS.h1, color: isDark ? COLORS.golden : COLORS.black }}>
             All Swaps
           </Text>
-          <Text
+          {/* <Text
             style={{
               ...FONTS.body4,
               color: isDark ? COLORS.golden : COLORS.black,
             }}>
             Tuesday, 18th October 2022
+          </Text> */}
+          <Text
+            style={{
+              ...FONTS.body4,
+              color: isDark ? COLORS.golden : COLORS.black,
+            }}>
+            {moment(new Date()).format('LLLL').slice(0,-8)}
           </Text>
         </View>
 
@@ -275,7 +282,25 @@ const AllSwapScreen = ({ navigation }: any) => {
                           }}>
                           {item.date}
                         </Text>
-                        {renderLeftSection(item)}
+                        {/* {renderLeftSection(item)} */}
+                        { item.status == "Confirmation Pending" && item.is_my_negotiate == '1' ? 
+                     ( <View>
+                        <Image
+                          source={isDark ? icons.ic_alert_dark : icons.ic_alert_dark}
+                          style={{ width: 27, height: 27, marginVertical: SIZES.padding / 8 }}
+                        />
+                      </View>)
+                      :
+                      ( item.status == "Accept" ?
+                      <View>
+                        <Image
+                          source={
+                            isDark ? icons.ic_check_green_dark : icons.ic_check_green_light
+                          }
+                          style={{ width: 27, height: 27, marginVertical: SIZES.padding / 8 }}
+                        />
+                      </View> : null)
+                      }
                       </View>
                       <View
                         style={{
@@ -293,7 +318,7 @@ const AllSwapScreen = ({ navigation }: any) => {
                             fontWeight: '600',
                             flex: 1,
                           }}>
-                          {item.duty_type === 'Specific Flight' && item.total_return_name}
+                          {item.duty_type === 'Specific Flight' && item.total_return_name.split("-").join(" - ")}
                           {item.duty_type === 'Standby' && `STANDBY • ${item.sub_duty_type}`}
                           {item.duty_type === 'Off' && "Off"}
                         </Text>

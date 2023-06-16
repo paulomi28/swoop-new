@@ -17,6 +17,7 @@ import {
 import { COLORS, FONTS, icons, SIZES } from '../constants';
 import { ThemeContext } from '../Contexts/ThemeContext';
 import { AuthContext } from '../Contexts/AuthContext';
+import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -115,6 +116,18 @@ export default function InReturns(props: any) {
   const [comment, setComment] = useState('');
   const [screenName, setScreenName] = useState('');
 
+
+  const [startTime,setStartTime] = useState("")
+  const [endTime,setEndTime] = useState("")
+
+  const [stimeopen, setSTimeOpen] = useState(false);
+  const [etimeopen, setETimeOpen] = useState(false);
+
+  const [sDuration,setSDuration]= useState(0)
+  const [eDuration,setEDuration]= useState(0)
+
+  const [timeDiff,setTimeDiff] = useState("")
+
   console.log('in return screen props ::', props.route.params);
 
   const isFocused = useIsFocused();
@@ -130,6 +143,43 @@ export default function InReturns(props: any) {
     setComment('');
     setTotalFlights([]);
   }, [isFocused]);
+
+  useEffect(()=>{
+    if(sDuration != 0 && eDuration != 0){
+    let actime = (eDuration - sDuration)
+    var hours   = Math.floor(actime / 3600);
+    var minutes = Math.floor((actime - (hours * 3600)) / 60);
+    const time = `${hours}:${minutes}` 
+    setTimeDiff(time)
+    }
+  },[sDuration,eDuration])
+
+
+  const hideDatePickerTime = () => {
+    setSTimeOpen(false);
+    setETimeOpen(false);
+  };
+
+  const handleConfirmTime = (time: any,savetime : string) => {
+    // const newtime = moment(time).format('LT')
+    const newtime = moment(time, 'hh:mm A'). format('HH:mm')
+   console.log(newtime,"setected time ------")
+   console.log(time,"setected time")
+   if(savetime == "STime"){
+   
+    const stdur : any = moment(time).unix()
+    setSDuration(stdur)
+    setStartTime(newtime)
+   }else{
+   
+    const etdur : any = moment(time).unix()
+    setEDuration(etdur)
+    setEndTime(newtime)
+   }
+   
+   setSTimeOpen(false)
+   setETimeOpen(false)
+  };
 
   const getFlight = async () => {
     console.log('user:::', user);
@@ -377,6 +427,8 @@ export default function InReturns(props: any) {
     }
   };
 
+  console.log(screenName,"screen name ----")
+
   return (
     <SafeAreaView
       style={{
@@ -392,10 +444,12 @@ export default function InReturns(props: any) {
           }}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.goBack(), setSelectedDutyType('');
+              // props.navigation.goBack(), 
+              setSelectedDutyType('');
               setSubFlight('');
               setSubDutyType('');
               setTotalFlights([]);
+              props.navigation.navigate("CreateSwapScreen")
             }}>
             <Image
               source={isDark ? icons.ic_back_dark : icons.ic_back_light}
@@ -451,7 +505,7 @@ export default function InReturns(props: any) {
             <Text
               style={{
                 color:
-                  selectedDutyType === '' ? COLORS.darkGray : COLORS.bgBlack,
+                  selectedDutyType === '' ? COLORS.darkGray :isDark ? COLORS.golden : COLORS.bgBlack,
                 ...FONTS.h3,
                 ...styles.inputField,
               }}>
@@ -593,9 +647,25 @@ export default function InReturns(props: any) {
                           alignItems: 'center',
                           borderRadius: 5,
                         }}>
-                        <Text style={{ color: COLORS.bgBlack }}>
+                        {/* <Text style={{ color: COLORS.bgBlack }}>
                           {item.sub_option.startTime}
-                        </Text>
+                        </Text> */}
+                         <TouchableOpacity
+                          onPress={()=>{setSTimeOpen(true)}}
+                          style={{width:50,alignItems:"center",justifyContent:"center"}}
+                        >
+                            <DatePicker
+                              mode="time"
+                              modal
+                              locale="en_GB"
+                              is24hourSource={'locale'}
+                              open={stimeopen}
+                              date={new Date ()}
+                              onConfirm={time => handleConfirmTime(time,"STime")}
+                              onCancel={hideDatePickerTime}
+                            />
+                            <Text style={{color : isDark ? COLORS.golden : COLORS.black}}>{startTime != '' ? startTime :'00:00'}z</Text>
+                        </TouchableOpacity>
 
                         <View
                           style={{
@@ -614,9 +684,11 @@ export default function InReturns(props: any) {
                             }
                             style={{ width: 20, height: 20 }}
                           />
-                          <Text style={{ color: COLORS.bgBlack, fontSize: 10 }}>
-                            Duration: {item.sub_option.Duration}
+                          <Text style={{ color: isDark ? COLORS.golden : COLORS.bgBlack, fontSize: 10 }}>
+                            {/* Duration: {item.sub_option.Duration} */}
+                            Duration: {timeDiff != "" ? timeDiff : "00:00"} hr
                           </Text>
+                          
                         </View>
                         <View
                           style={{
@@ -626,9 +698,25 @@ export default function InReturns(props: any) {
                             marginHorizontal: 10,
                           }}
                         />
-                        <Text style={{ color: COLORS.bgBlack }}>
+                        {/* <Text style={{ color: COLORS.bgBlack }}>
                           {item.sub_option.endTime}
-                        </Text>
+                        </Text> */}
+                        <TouchableOpacity
+                          onPress={()=>{setETimeOpen(true)}}
+                          style={{width:50,alignItems:"center",justifyContent:"center"}}
+                        >
+                            <DatePicker
+                              mode="time"
+                              modal
+                              locale="en_GB"
+                              is24hourSource={'locale'}
+                              open={etimeopen}
+                              date={new Date ()}
+                              onConfirm={time => handleConfirmTime(time,"ETime")}
+                              onCancel={hideDatePickerTime}
+                            />
+                            <Text style={{color : isDark ? COLORS.golden : COLORS.black}}>{endTime != '' ? endTime :'00:00'}z</Text>
+                        </TouchableOpacity>
                       </View>
                     )}
                   </>
@@ -766,7 +854,7 @@ export default function InReturns(props: any) {
                         style={{
                           flex: 1,
                           // backgroundColor: COLORS.lightGolden,
-                          padding: 5,
+                          // padding: 5,
                           marginVertical: 3,
                           borderRadius: 3,
                           flexDirection: 'row',
@@ -782,7 +870,8 @@ export default function InReturns(props: any) {
                             width: 27,
                             height: 27,
                             marginBottom: 10,
-                            marginHorizontal: 7,
+                            // marginHorizontal: 7,
+                            marginRight:15
                           }}
                         />
 
@@ -794,7 +883,7 @@ export default function InReturns(props: any) {
                           }}>
                           <Text
                             style={{
-                              color: COLORS.bgBlack,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '600',
                               fontSize: 10,
                             }}>
@@ -802,7 +891,7 @@ export default function InReturns(props: any) {
                           </Text>
                           <Text
                             style={{
-                              color: COLORS.bgBlack,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '600',
                               fontSize: 10,
                             }}>
@@ -810,7 +899,8 @@ export default function InReturns(props: any) {
                           </Text>
                           <Text
                             style={{
-                              color: COLORS.darkGray,
+                              // color: COLORS.darkGray,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '400',
                               fontSize: 10,
                             }}>
@@ -863,7 +953,7 @@ export default function InReturns(props: any) {
                           }}>
                           <Text
                             style={{
-                              color: COLORS.bgBlack,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '600',
                               fontSize: 10,
                             }}>
@@ -871,7 +961,8 @@ export default function InReturns(props: any) {
                           </Text>
                           <Text
                             style={{
-                              color: COLORS.darkGray,
+                              // color: COLORS.darkGray,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '400',
                               fontSize: 10,
                             }}>
@@ -1058,7 +1149,8 @@ export default function InReturns(props: any) {
         />
         <TextInput
           placeholder="Comments"
-          style={{ ...FONTS.h3, marginLeft: SIZES.padding,width:"78%"}}
+          multiline={true}
+          style={{ ...FONTS.h3, marginLeft: SIZES.padding,width:"78%",height:80}}
           placeholderTextColor={isDark ? COLORS.golden : COLORS.black}
           onChangeText={text => setComment(text)}
         />

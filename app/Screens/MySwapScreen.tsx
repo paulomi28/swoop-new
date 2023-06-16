@@ -15,6 +15,7 @@ import { ThemeContext } from '../Contexts/ThemeContext';
 import { AuthContext } from '../Contexts/AuthContext';
 import OneSwap from '../Components/OneSwap';
 import { useIsFocused } from '@react-navigation/native';
+import moment from 'moment';
 
 const MySwapScreen = ({ navigation }: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -89,8 +90,10 @@ const MySwapScreen = ({ navigation }: any) => {
 
   const renderLeftSection = (string: string) => {
     switch (string) {
-      case 'pending':
+      // case 'pending':
+      case 'Pending':
         break;
+      // case 'Confirmation Pending':
       case 'Confirmation Pending':
         return (
           <View>
@@ -225,12 +228,20 @@ const MySwapScreen = ({ navigation }: any) => {
             style={{ ...FONTS.h1, color: isDark ? COLORS.golden : COLORS.black }}>
             My Swaps
           </Text>
+          {/* <Text
+            style={{
+              ...FONTS.body4,
+              color: isDark ? COLORS.golden : COLORS.black,
+            }}>
+            Tuesday, 18th October 2023
+          </Text>
+           */}
           <Text
             style={{
               ...FONTS.body4,
               color: isDark ? COLORS.golden : COLORS.black,
             }}>
-            Tuesday, 18th October 2022
+            {moment(new Date()).format('LLLL').slice(0,-8)}
           </Text>
         </View>
 
@@ -312,7 +323,25 @@ const MySwapScreen = ({ navigation }: any) => {
                           {/* {item.duty_type.toUpperCase()} */}
                         </Text>
                       </View>
-                      {renderLeftSection(item.status)}
+                      {/* {renderLeftSection(item.status)} */}
+                     { item.status == "Confirmation Pending" ? 
+                     ( <View>
+                        <Image
+                          source={isDark ? icons.ic_alert_dark : icons.ic_alert_dark}
+                          style={{ width: 27, height: 27, marginVertical: SIZES.padding / 8 }}
+                        />
+                      </View>)
+                      :
+                      ( item.status == "Accept" ?
+                      <View>
+                        <Image
+                          source={
+                            isDark ? icons.ic_check_green_dark : icons.ic_check_green_light
+                          }
+                          style={{ width: 27, height: 27, marginVertical: SIZES.padding / 8 }}
+                        />
+                      </View> : null)
+                      }
                     </View>
                     {item.checkOpen === true && (
                       <TouchableOpacity

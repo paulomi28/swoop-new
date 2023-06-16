@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState ,useEffect} from 'react';
 import { Image, SafeAreaView, Text, TextInput, View, StyleSheet, TouchableOpacity } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { COLORS, FONTS, icons, SIZES } from '../constants';
 import { ThemeContext } from '../Contexts/ThemeContext';
 import { AuthContext } from '../Contexts/AuthContext';
+import SelectDropdown from 'react-native-select-dropdown';
 
 const SettingScreen = ({ navigation }: any) => {
   const [username, setUserName] = useState('');
@@ -15,10 +16,55 @@ const SettingScreen = ({ navigation }: any) => {
   const { isDark, toggleDark } = useContext(ThemeContext)
 
   const { logout, user } = useContext(AuthContext)
+  const [airLineList, setAirLineList] = useState([]);
 
   const [homeBase, setHomeBase] = useState(user.home_base);
   const [crewcode, setCrewcode] = useState(user.crewcode);
   const [isChecked, setIsChecked] = useState(user.position == 'First Officer' ? true : false);
+  const [selectedAirline, setSelectedAirline] = useState('');
+
+  useEffect(() => {
+    getAirLineList();
+  }, []);
+
+  const getAirLineList = async () => {
+    try {
+      let temp = [];
+      var myHeaders = new Headers();
+      myHeaders.append('key', '2b223e5cee713615ha54ac203b24e9a123754yuVT');
+      //   myHeaders.append('token', 'PmUYTPFGbtehfbKt7WekfgRQS5UpVBPo');
+      myHeaders.append(
+        'Authorization',
+        `Bearer ${'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL1N3b29wIiwiYXVkIjoiaHR0cDpcL1wvbG9jYWxob3N0XC9Td29vcCIsImlhdCI6MTY4MzUzOTEyMCwiZXhwIjoxNjgzNjI1NTIwLCJkYXRhIjp7InVzZXJfaWQiOiIxIn19.nU9jyczqIByNStwyHr6RD4VlxJB_2bWuN1J-xx2gSNk'} `,
+      );
+      var formdata = new FormData();
+      formdata.append('user_id', 1);
+
+      const response = await fetch(
+        'https://client.appmania.co.in/Swoop/api/getAirlinesList',
+        {
+          method: 'POST',
+          headers: myHeaders,
+          body: formdata,
+        },
+      );
+
+      const responseJson = await response.json();
+
+      if (response.status === 200) {
+        if (responseJson.ResponseCode === 1) {
+          console.log('responseJson :::', JSON.stringify(responseJson.data));
+          responseJson.data.map(mapItem => {
+            temp.push(mapItem.name);
+          });
+          setAirLineList([...temp]);
+        }
+      }
+    } catch (error) {
+      console.log('error::', error);
+    }
+  };
+
 
   return (
     <Swiper
@@ -56,6 +102,49 @@ const SettingScreen = ({ navigation }: any) => {
             <View
               style={[styles.inputFieldComponent,]}>
               <Image
+                style={{width: 27, height: 27}}
+                source={isDark ? icons.ic_airline_dark : icons.ic_airline_light}
+              />
+              <SelectDropdown
+                data={airLineList}
+                onSelect={(selectedItem, index) => {
+                  console.log(selectedItem, index);
+                  setSelectedAirline(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  // text represented after item is selected
+                  // if data array is an array of objects then return selectedItem.property to render after item is selected
+                  return selectedItem;
+                }}
+                rowTextStyle={{
+                  position:"absolute",
+                  left:10,
+                  color : isDark ? COLORS.golden : COLORS.bgBlack,
+                }}
+                rowTextForSelection={(item, index) => {
+                  // text represented for each item in dropdown
+                  // if data array is an array of objects then return item.property to represent item in dropdown
+                  return item;
+                }}
+                // defaultButtonText="Select Airline"
+                defaultButtonText="Airline"
+              
+                buttonStyle={{
+                  width: '100%',
+                  backgroundColor: isDark ? COLORS.bgBlack : COLORS.gray,
+                  
+                
+                }}
+                buttonTextStyle={{textAlign:"left",marginLeft:20,color:isDark ? COLORS.golden : COLORS.bgBlack}}
+                dropdownStyle={{
+                  width: '80%',
+                  backgroundColor: isDark ? COLORS.bgBlack : COLORS.gray,
+                }}
+              />
+            </View>
+            {/* <View
+              style={[styles.inputFieldComponent,]}>
+              <Image
                 style={{ width: 27, height: 27 }}
                 source={isDark ? icons.ic_airline_dark : icons.ic_airline_light}
               />
@@ -65,7 +154,7 @@ const SettingScreen = ({ navigation }: any) => {
                 style={{ width: 16, height: 16, marginLeft: SIZES.padding * 2 }}
                 source={isDark ? icons.ic_down_dark : icons.ic_down_light}
               />
-            </View>
+            </View> */}
             <View
               style={styles.inputFieldComponent}>
               <Image

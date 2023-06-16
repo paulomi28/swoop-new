@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Image,
   Text,
@@ -58,6 +58,7 @@ const Standby = [
 export default function CreateSwapScreen({ navigation }: any) {
   const [selectDate, setSelectDate] = useState(new Date());
   const [secondDate, setSecondDate] = useState('');
+  const [firstDate, setFirstDate] = useState('');
   const [open, setOpen] = useState(false);
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const [selectedDutyType, setSelectedDutyType] = useState('');
@@ -66,20 +67,69 @@ export default function CreateSwapScreen({ navigation }: any) {
   const [totalFlights, setTotalFlights] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [startTime,setStartTime] = useState("")
+  const [endTime,setEndTime] = useState("")
+
+  const [stimeopen, setSTimeOpen] = useState(false);
+  const [etimeopen, setETimeOpen] = useState(false);
+
+  const [sDuration,setSDuration]= useState(0)
+  const [eDuration,setEDuration]= useState(0)
+
+  const [timeDiff,setTimeDiff] = useState("")
+
   const { isDark } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
   const hideDatePicker = () => {
     setOpen(false);
   };
+  
+  const hideDatePickerTime = () => {
+    setSTimeOpen(false);
+    setETimeOpen(false);
+  };
 
   const handleConfirm = (date: any) => {
     let newDate  = moment(date).format('DD/MM/YYYY');
+    let newDate1  = moment(date).format('YYYY/MM/DD');
     console.log(newDate,"new date logg");
     console.log(date,"new date logg");
     setOpen(false);
     setSelectDate(date);
     setSecondDate(newDate);
+    setFirstDate(newDate1);
   };
+  
+  const handleConfirmTime = (time: any,savetime : string) => {
+    // const newtime = moment(time).format('LT')
+    const newtime = moment(time, 'hh:mm A'). format('HH:mm')
+   console.log(newtime,"setected time ------")
+   console.log(time,"setected time")
+   if(savetime == "STime"){
+   
+    const stdur : any = moment(time).unix()
+    setSDuration(stdur)
+    setStartTime(newtime)
+   }else{
+   
+    const etdur : any = moment(time).unix()
+    setEDuration(etdur)
+    setEndTime(newtime)
+   }
+   
+   setSTimeOpen(false)
+   setETimeOpen(false)
+  };
+
+  useEffect(()=>{
+    if(sDuration != 0 && eDuration != 0){
+    let actime = (eDuration - sDuration)
+    var hours   = Math.floor(actime / 3600);
+    var minutes = Math.floor((actime - (hours * 3600)) / 60);
+    const time = `${hours}:${minutes}` 
+    setTimeDiff(time)
+    }
+  },[sDuration,eDuration])
 
   const getFlight = async () => {
     console.log('user:::', user);
@@ -135,7 +185,8 @@ export default function CreateSwapScreen({ navigation }: any) {
 
   const navigateToReturn = () => {
     let Object = {
-      date: secondDate,
+      // date: secondDate,
+      date: firstDate,
       duty_type:
         selectedDutyType !== ''
           ? dropDownOptions[selectedDutyType - 1].option
@@ -148,6 +199,8 @@ export default function CreateSwapScreen({ navigation }: any) {
         subDutyType !== '' ? (subDutyType === 1 ? '20:00:00' : '20:00:00') : '',
       duration: subDutyType !== '' ? '10:00:00' : '',
       total_flights: totalFlights,
+      start_time : startTime,
+      end_time : endTime
     };
     console.log('Object :::', JSON.stringify(Object));
     navigation.navigate('InReturnsScreen', {
@@ -352,7 +405,7 @@ export default function CreateSwapScreen({ navigation }: any) {
                 <TouchableOpacity onPress={() => getFlight()}>
                   <Image
                     source={
-                      isDark ? icons.ic_search_dark : icons.ic_search_dark
+                      isDark ? icons.ic_search_dark : icons.ic_search_light
                     }
                     style={{
                       width: 27,
@@ -376,7 +429,7 @@ export default function CreateSwapScreen({ navigation }: any) {
                         style={{
                           flex: 1,
                           // backgroundColor: COLORS.lightGolden,
-                          padding: 5,
+                          // padding: 5,
                           marginVertical: 3,
                           borderRadius: 3,
                           flexDirection: 'row',
@@ -392,7 +445,8 @@ export default function CreateSwapScreen({ navigation }: any) {
                             width: 27,
                             height: 27,
                             marginBottom: 10,
-                            marginHorizontal: 7,
+                            // marginHorizontal: 7,
+                            marginRight:15
                           }}
                         />
 
@@ -404,7 +458,7 @@ export default function CreateSwapScreen({ navigation }: any) {
                           }}>
                           <Text
                             style={{
-                              color: COLORS.bgBlack,
+                              color:isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '600',
                               fontSize: 10,
                             }}>
@@ -412,7 +466,7 @@ export default function CreateSwapScreen({ navigation }: any) {
                           </Text>
                           <Text
                             style={{
-                              color: COLORS.bgBlack,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '600',
                               fontSize: 10,
                             }}>
@@ -420,7 +474,8 @@ export default function CreateSwapScreen({ navigation }: any) {
                           </Text>
                           <Text
                             style={{
-                              color: COLORS.darkGray,
+                              // color: COLORS.darkGray,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '400',
                               fontSize: 10,
                             }}>
@@ -473,7 +528,7 @@ export default function CreateSwapScreen({ navigation }: any) {
                           }}>
                           <Text
                             style={{
-                              color: COLORS.bgBlack,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '600',
                               fontSize: 10,
                             }}>
@@ -481,7 +536,8 @@ export default function CreateSwapScreen({ navigation }: any) {
                           </Text>
                           <Text
                             style={{
-                              color: COLORS.darkGray,
+                              // color: COLORS.darkGray,
+                              color: isDark ? COLORS.golden : COLORS.bgBlack,
                               fontWeight: '400',
                               fontSize: 10,
                             }}>
@@ -548,9 +604,37 @@ export default function CreateSwapScreen({ navigation }: any) {
                           alignItems: 'center',
                           borderRadius: 5,
                         }}>
-                        <Text style={{ color: COLORS.bgBlack, flex: 1 }}>
+                        {/* <Text style={{ color: COLORS.bgBlack, flex: 1 }}>
                           {item.sub_option.startTime}
-                        </Text>
+                        </Text> */}
+                        <TouchableOpacity
+                          onPress={()=>{setSTimeOpen(true)}}
+                          style={{width:50,alignItems:"center",justifyContent:"center"}}
+                        >
+                            <DatePicker
+                              mode="time"
+                              modal
+                              locale="en_GB"
+                              is24hourSource={'locale'}
+                              open={stimeopen}
+                              date={new Date ()}
+                              onConfirm={time => handleConfirmTime(time,"STime")}
+                              onCancel={hideDatePickerTime}
+                            />
+                            <Text style={{color : isDark ? COLORS.golden : COLORS.black}}>{startTime != '' ? startTime :'00:00'}z</Text>
+                        </TouchableOpacity>
+                        {/* <TextInput 
+                          placeholder='00:00'
+                          placeholderTextColor={isDark ? COLORS.golden : COLORS.black}
+                          keyboardType="decimal-pad"
+                          onChangeText={(text)=>{
+                              setStartTime(text)
+                          }}  
+                          style={{
+                            width:50,
+                            color : isDark ? COLORS.golden : COLORS.black
+                          }}
+                        /> */}
 
                         <View
                           style={{
@@ -569,8 +653,9 @@ export default function CreateSwapScreen({ navigation }: any) {
                             }
                             style={{ width: 20, height: 20 }}
                           />
-                          <Text style={{ color: COLORS.bgBlack, fontSize: 10 }}>
-                            Duration: {item.sub_option.Duration}
+                          <Text style={{ color: isDark ? COLORS.golden : COLORS.bgBlack, fontSize: 10 }}>
+                            {/* Duration: {item.sub_option.Duration} */}
+                            Duration: {timeDiff != "" ? timeDiff : "00:00"} hr
                           </Text>
                         </View>
                         <View
@@ -581,9 +666,37 @@ export default function CreateSwapScreen({ navigation }: any) {
                             marginHorizontal: 10,
                           }}
                         />
-                        <Text style={{ color: COLORS.bgBlack, flex: 1 }}>
+                        {/* <Text style={{ color: COLORS.bgBlack, flex: 1 }}>
                           {item.sub_option.endTime}
-                        </Text>
+                        </Text> */}
+                        <TouchableOpacity
+                          onPress={()=>{setETimeOpen(true)}}
+                          style={{width:50,alignItems:"center",justifyContent:"center"}}
+                        >
+                            <DatePicker
+                              mode="time"
+                              modal
+                              locale="en_GB"
+                              is24hourSource={'locale'}
+                              open={etimeopen}
+                              date={new Date ()}
+                              onConfirm={time => handleConfirmTime(time,"ETime")}
+                              onCancel={hideDatePickerTime}
+                            />
+                            <Text style={{color : isDark ? COLORS.golden : COLORS.black}}>{endTime != '' ? endTime :'00:00'}z</Text>
+                        </TouchableOpacity>
+                        {/* <TextInput 
+                          placeholder='00:00'
+                          placeholderTextColor={isDark ? COLORS.golden : COLORS.black}
+                          keyboardType="decimal-pad"
+                          onChangeText={(text)=>{
+                            setEndTime(text)
+                          }}
+                          style={{
+                            width:50,
+                            color : isDark ? COLORS.golden : COLORS.black
+                          }}
+                        /> */}
                       </View>
                     )}
                   </>
